@@ -61,6 +61,7 @@ PROCEDURE setOptions:
     RUN setOption IN hComp ('FIELDQLF', IF ENTRY(34, ipPrm, ';') EQ 'true' THEN '1' ELSE '0').
     RUN setOption IN hComp ('CALLBACKCLASS', ENTRY(35, ipPrm, ';')).
 
+    RUN setOption IN hComp ('PCTRCODE', IF ENTRY(36, ipPrm, ';') EQ 'true' THEN '1' ELSE '0').
     RUN initModule IN hComp.
 
     ASSIGN opOk = TRUE.

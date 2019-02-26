@@ -1256,5 +1256,28 @@ public class PCTCompileTest extends BuildFileTestNg {
             Assert.fail("Unable to read file", e);
         }
     }
+    
+    @Test(groups = {"v10"})
+    public void test79() {
+        configureProject(BASEDIR + "test76/build.xml");
+
+        List<String> rexp = new ArrayList<>();
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("1 file\\(s\\) compiled");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("0 file\\(s\\) compiled");
+        expectLogRegexp("test1", rexp, false);
+        
+        rexp.clear();
+        rexp.add(".*");
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("1 file\\(s\\) compiled");
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("1 file\\(s\\) compiled");
+        expectLogRegexp("test2", rexp, false);
+    }
 
 }
