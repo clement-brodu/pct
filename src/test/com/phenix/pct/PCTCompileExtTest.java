@@ -24,8 +24,10 @@ import static org.testng.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -1356,5 +1358,28 @@ public class PCTCompileExtTest extends BuildFileTestNg {
         File f2 = new File(BASEDIR + "test107/build/test2.r");
         assertTrue(f1.exists());
         assertTrue(f2.exists());
+    }
+
+    @Test(groups = {"v10"})
+    public void test80() {
+        configureProject(BASEDIR + "test80/build.xml");
+
+        List<String> rexp = new ArrayList<>();
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add(Pattern.quote(MessageFormat.format(Messages.getString("PCTCompile.44"), 1)));
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add(Pattern.quote(MessageFormat.format(Messages.getString("PCTCompile.44"), 0)));
+        expectLogRegexp("test1", rexp, false);
+        
+        rexp.clear();
+        rexp.add(".*");
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add(Pattern.quote(MessageFormat.format(Messages.getString("PCTCompile.44"), 1)));
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add(Pattern.quote(MessageFormat.format(Messages.getString("PCTCompile.44"), 1)));
+        expectLogRegexp("test2", rexp, false);
     }
 }

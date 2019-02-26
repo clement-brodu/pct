@@ -1264,7 +1264,7 @@ public class PCTCompileTest extends BuildFileTestNg {
             Assert.fail("Unable to read file", e);
         }
     }
-
+    
     @Test(groups = {"v10"})
     public void test79() {
         String projectResultFile = BASEDIR + "test79/build/.pct/project-result.json";
@@ -1300,8 +1300,31 @@ public class PCTCompileTest extends BuildFileTestNg {
         expectLogFileContent("test6", projectResultFile,
                 "{\"ttProjectWarnings\":[{\"msgNum\":18494,\"rowNum\":2,\"fileName\":\"src\\/dir1\\/test5.p\",\"mainFileName\":\"src\\/dir1\\/test5.p\",\"msg\":\"Cannot reference \\\"DEFINE\\\" as \\\"DEF\\\" due to the \\\"require-full-keywords\\\" compiler option. (18494)\"},{\"msgNum\":18494,\"rowNum\":2,\"fileName\":\"src\\/dir1\\/test5.p\",\"mainFileName\":\"src\\/dir1\\/test5.p\",\"msg\":\"Cannot reference \\\"integer\\\" as \\\"INT\\\" due to the \\\"require-full-keywords\\\" compiler option. (18494)\"}],\"compiledFiles\":1,\"errorFiles\":0}");
 
-        expectLogFileContent("test7", projectResultFile,
+                expectLogFileContent("test7", projectResultFile,
                 "{\"ttProjectWarnings\":[{\"msgNum\":18494,\"rowNum\":2,\"fileName\":\"src\\/dir1\\/test6.i\",\"mainFileName\":\"src\\/dir1\\/test6.p\",\"msg\":\"Cannot reference \\\"VARIABLE\\\" as \\\"VAR\\\" due to the \\\"require-full-keywords\\\" compiler option. (18494)\"}],\"compiledFiles\":1,\"errorFiles\":0}");
+    }
+    
+    @Test(groups = {"v10"})
+    public void test80() {
+        configureProject(BASEDIR + "test80/build.xml");
+    
+        List<String> rexp = new ArrayList<>();
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("1 file\\(s\\) compiled");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("0 file\\(s\\) compiled");
+        expectLogRegexp("test1", rexp, false);
+        
+        rexp.clear();
+        rexp.add(".*");
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("1 file\\(s\\) compiled");
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("1 file\\(s\\) compiled");
+        expectLogRegexp("test2", rexp, false);
     }
 
 }

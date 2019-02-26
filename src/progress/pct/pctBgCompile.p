@@ -62,6 +62,8 @@ PROCEDURE setOptions:
     RUN setOption IN hComp ('CALLBACKCLASS', ENTRY(35, ipPrm, ';')).
     RUN setOption IN hComp ('OUTPUTTYPE', ENTRY(36, ipPrm, ';')).
 
+    /* Penser à incrémenter */
+    RUN setOption IN hComp ('PCTRCODE', IF ENTRY(37, ipPrm, ';') EQ 'true' THEN '1' ELSE '0').
     RUN initModule IN hComp.
 
     ASSIGN opOk = TRUE.
