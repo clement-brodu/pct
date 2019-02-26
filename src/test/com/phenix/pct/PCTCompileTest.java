@@ -829,6 +829,8 @@ public class PCTCompileTest extends BuildFileTestNg {
                 return;
         } catch (IOException caught) {
             return;
+        } catch (InvalidRCodeException caught) {
+            return;
         }
 
         configureProject(BASEDIR + "test52/build.xml");
@@ -851,6 +853,8 @@ public class PCTCompileTest extends BuildFileTestNg {
             if ((version.getMajorVersion() == 11) && (version.getMinorVersion() <= 6))
                 return;
         } catch (IOException caught) {
+            return;
+        } catch (InvalidRCodeException caught) {
             return;
         }
 
@@ -948,6 +952,8 @@ public class PCTCompileTest extends BuildFileTestNg {
             if (version.getMajorVersion() < 11)
                 return;
         } catch (IOException caught) {
+            return;
+        } catch (InvalidRCodeException caught) {
             return;
         }
 
@@ -1203,6 +1209,8 @@ public class PCTCompileTest extends BuildFileTestNg {
                 return;
         } catch (IOException e) {
             return;
+        } catch (InvalidRCodeException e) {
+            return;
         }
 
         configureProject(BASEDIR + "test76/build.xml");
@@ -1224,6 +1232,8 @@ public class PCTCompileTest extends BuildFileTestNg {
             if ((version.getMajorVersion() == 11) && (version.getMinorVersion() <= 2))
                 return;
         } catch (IOException e) {
+            return;
+        } catch (InvalidRCodeException e) {
             return;
         }
 
@@ -1398,6 +1408,29 @@ public class PCTCompileTest extends BuildFileTestNg {
             fail("Caught IOException", caught);
         }
     }
+    
+    @Test(groups = {"v10"})
+    public void test79specif() {
+        configureProject(BASEDIR + "test79specif/build.xml");
+    
+        List<String> rexp = new ArrayList<>();
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("1 file\\(s\\) compiled");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("0 file\\(s\\) compiled");
+        expectLogRegexp("test1", rexp, false);
+        
+        rexp.clear();
+        rexp.add(".*");
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("1 file\\(s\\) compiled");
+        rexp.add(".*");
+        rexp.add("PCTCompile - Progress Code Compiler");
+        rexp.add("1 file\\(s\\) compiled");
+        expectLogRegexp("test2", rexp, false);
+    }
 
     @Test(groups = {"v12"})
     public void test80() {
@@ -1407,6 +1440,8 @@ public class PCTCompileTest extends BuildFileTestNg {
             if ((version.getMajorVersion() == 12) && (version.getMinorVersion() <= 2))
                 return;
         } catch (IOException caught) {
+            return;
+        } catch (InvalidRCodeException caught) {
             return;
         }
 
