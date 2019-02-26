@@ -355,6 +355,8 @@ public class PCTBgCompile extends PCTBgRun {
             sb.append("").append(';'); // outputType is not supported on multi-threaded environment
             sb.append(Boolean.toString(compAttrs.isRequireReturnValues())).append(';');
 
+            sb.append(Boolean.toString(compAttrs.isPctRcode())).append(';');
+            
             return sb.toString();
         }
 
