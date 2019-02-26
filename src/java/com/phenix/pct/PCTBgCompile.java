@@ -354,6 +354,8 @@ public class PCTBgCompile extends PCTBgRun {
             sb.append(compAttrs.getCallbackClass() == null ? "" : compAttrs.getCallbackClass()).append(';');
             sb.append("").append(';'); // outputType is not supported on multi-threaded environment
 
+            sb.append(Boolean.toString(compAttrs.isPctRcode())).append(';');
+            
             return sb.toString();
         }
 
