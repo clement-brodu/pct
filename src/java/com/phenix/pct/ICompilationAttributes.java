@@ -224,4 +224,9 @@ public interface ICompilationAttributes {
      * @param callback ABL Class
      */
     void setCallbackClass(String callback);
+
+    /*
+     * Check if existing RCode was build by PCT
+     */
+    void setPctRcode(boolean pctRcode);
 }

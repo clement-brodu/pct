@@ -242,6 +242,8 @@ public class PCTCompile extends PCTRun {
                 bw.write("CALLBACKCLASS=" + compAttrs.getCallbackClass());
                 bw.newLine();
             }
+            bw.write("PCTRCODE=" + (compAttrs.isPctRcode() ? 1 : 0));
+            bw.newLine();
         } catch (IOException ioe) {
             throw new BuildException(Messages.getString("PCTCompile.3"), ioe); //$NON-NLS-1$
         }

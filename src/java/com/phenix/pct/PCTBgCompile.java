@@ -338,6 +338,8 @@ public class PCTBgCompile extends PCTBgRun {
             sb.append(Boolean.toString(compAttrs.isRequireFieldQualifiers())).append(';');
             sb.append(compAttrs.getCallbackClass() == null ? "" : compAttrs.getCallbackClass()).append(';');
 
+            sb.append(Boolean.toString(compAttrs.isPctRcode())).append(';');
+            
             return sb.toString();
         }
 

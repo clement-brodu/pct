@@ -67,6 +67,7 @@ public class CompilationAttributes implements ICompilationAttributes {
     private String ignoredIncludes = null;
     private int fileList = 0;
     private String callback = null;
+    private boolean pctRcode = false;
 
     // Internal use
     private final PCT parent;
@@ -279,6 +280,10 @@ public class CompilationAttributes implements ICompilationAttributes {
     public void setCallbackClass(String callback) {
         this.callback = callback;
     }
+        
+    public void setPctRcode(boolean pctRcode){
+        this.pctRcode = pctRcode;
+    }
 
     public List<ResourceCollection> getResources() {
         return resources;
@@ -430,6 +435,10 @@ public class CompilationAttributes implements ICompilationAttributes {
 
     public String getCallbackClass() {
         return callback;
+    }
+    
+    public boolean isPctRcode(){
+        return pctRcode;
     }
 
     protected void writeCompilationProcedure(File f, Charset c) {
