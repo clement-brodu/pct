@@ -185,7 +185,7 @@ PROCEDURE setOption.
     WHEN 'CALLBACKCLASS':U    THEN ASSIGN callbackClass = ipValue.
 
     WHEN 'PCTRCODE':U         THEN ASSIGN lPctRcode = (ipValue EQ '1':U).
-    
+  
     OTHERWISE RUN logError IN hSrcProc (SUBSTITUTE("Unknown parameter '&1' with value '&2'" ,ipName, ipValue)).
   END CASE.
 
@@ -280,6 +280,8 @@ PROCEDURE compileXref.
   DEFINE VARIABLE ProcTS    AS DATETIME   NO-UNDO.
   DEFINE VARIABLE cRenameFrom AS CHARACTER NO-UNDO INITIAL ''.
   DEFINE VARIABLE lWarnings AS LOGICAL NO-UNDO INITIAL FALSE.
+  DEFINE VARIABLE lUseTempDir AS LOGICAL NO-UNDO INITIAL FALSE.
+  DEFINE VARIABLE cTempDir AS CHARACTER NO-UNDO.
 
   /* Output progress */
   IF ProgPerc GT 0 THEN DO:
@@ -329,7 +331,7 @@ PROCEDURE compileXref.
     ASSIGN cRenameFrom = cBase + (IF cbase EQ '' THEN '' ELSE '/') + substring(cfile, 1, R-INDEX(cfile, '.') - 1) + '.r'.
   END.
 
-  IF (noParse OR ForceComp OR lXCode) THEN DO:
+IF (noParse OR ForceComp OR lXCode) THEN DO:
     ASSIGN opComp = 5.
   END.
   ELSE DO:
@@ -431,8 +433,19 @@ PROCEDURE compileXref.
   END.
 &ENDIF
 
+  /* For class, compile in temp dir to avoid parent class rcode */
+  IF multiComp = TRUE /* true = we probably don't want hierarchie */
+    AND cSaveDir <> ?  /* ? = let OE compile in default dir */
+    AND cFileExt = ".cls" THEN DO:
+    cTempDir = "tmpcomp" + STRING(RANDOM ( 0 , 999999 ), "999999" ) + STRING(ETIME).
+    lUseTempDir = createDir(SESSION:TEMP-DIRECTORY , cTempDir).
+    cTempDir = SESSION:TEMP-DIRECTORY + '/':U + cTempDir.
+    RUN logVerbose IN hSrcProc ("TempDir :" + cTempDir ).
+  END.
+
   RUN pctcomp.p (IF lRelative THEN ipInFile ELSE ipInDir + '/':U + ipInFile,
-                 cSaveDir, debugListingFile,
+                 IF lUseTempDir THEN cTempDir ELSE cSaveDir,
+                 debugListingFile,
                  IF Lst AND NOT LstPrepro THEN PCTDir + '/':U + ipInFile ELSE ?,
                  preprocessFile, cStrXrefFile, cXrefFile, IF bAboveEq1173 THEN cOpts ELSE "").
 
@@ -442,6 +455,13 @@ PROCEDURE compileXref.
 
   ASSIGN opError = COMPILER:ERROR.
   IF NOT opError THEN DO:
+
+    IF lUseTempDir THEN DO:
+      OS-COPY VALUE(cTempDir + '/' + ipOutFile) 
+              VALUE(outputDir + '/' + ipOutFile).
+      OS-DELETE VALUE(cTempDir ) RECURSIVE.
+    END.
+
     /* In order to handle <mapper> element */
     IF cRenameFrom NE '' THEN DO:
       OS-COPY VALUE(outputDir + '/' + cRenameFrom) VALUE(outputDir + '/' + ipOutFile).
@@ -477,6 +497,9 @@ PROCEDURE compileXref.
     END.
   END.
   ELSE DO:
+    IF lUseTempDir THEN DO:
+      OS-DELETE VALUE(cTempDir ) RECURSIVE.
+    END.
     RUN logError IN hSrcProc (SUBSTITUTE("Error compiling file '&1' ...", REPLACE(ipInDir + (IF ipInDir EQ '':U THEN '':U ELSE '/':U) + ipInFile, CHR(92), '/':U))).
     EMPTY TEMP-TABLE ttErrors.
     DO i = 1 TO COMPILER:NUM-MESSAGES:
