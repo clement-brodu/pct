@@ -1259,7 +1259,7 @@ public class PCTCompileTest extends BuildFileTestNg {
     
     @Test(groups = {"v10"})
     public void test79() {
-        configureProject(BASEDIR + "test76/build.xml");
+        configureProject(BASEDIR + "test79/build.xml");
 
         List<String> rexp = new ArrayList<>();
         rexp.add(".*");
