@@ -740,7 +740,8 @@ FUNCTION CheckPctRcode RETURNS LOGICAL (INPUT f AS CHARACTER, INPUT ts AS DATETI
   
   FILE-INFO:FILE-NAME = d + '/':U + f + '.inc':U.
   IF FILE-INFO:FULL-PATHNAME <> ? THEN DO:
-    RETURN (getTimeStampF(FILE-INFO:FULL-PATHNAME) <> ts). 
+    /* if Rcode is newer than .inc (sometime it's equal, but not always) */
+    RETURN (getTimeStampF(FILE-INFO:FULL-PATHNAME) < ts). 
   END.
   
   RETURN TRUE. /* Default is True */
