@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2018 Riverside Software
+ * Copyright 2005-2019 Riverside Software
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -816,6 +816,17 @@ public class PCTRun extends PCT implements IRunAttributes {
             this.internalPropath.addFilelist(list);
         }
     }
+
+    protected boolean isDirInPropath(File dir) {
+        if (runAttributes.getPropath() == null)
+            return false;
+        for (String str : runAttributes.getPropath().list()) {
+            if (new File(str).equals(dir))
+                return true;
+        }
+        return false;
+    }
+
 
     /**
      * Escapes a string so it does not accidentally contain Progress escape characters

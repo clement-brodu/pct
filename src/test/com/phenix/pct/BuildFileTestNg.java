@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2018 Riverside Software
+ * Copyright 2005-2019 Riverside Software
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ public class BuildFileTestNg {
      * @param property property name
      */
     public void assertPropertySet(String property) {
-        assertPropertyEquals(property, "true");
+        Assert.assertNotEquals(project.getProperty(property), null);
     }
 
     /**
@@ -117,7 +117,7 @@ public class BuildFileTestNg {
      * @param property property name
      */
     public void assertPropertyUnset(String property) {
-        assertPropertyEquals(property, null);
+        Assert.assertEquals(project.getProperty(property), null);
     }
 
     /**

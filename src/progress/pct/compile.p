@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2018 Riverside Software
+ * Copyright 2005-2019 Riverside Software
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -269,7 +269,6 @@ PROCEDURE compileXref.
   DEFINE VARIABLE cFile    AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE cFile2    AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE cFileExt AS CHARACTER  NO-UNDO.
-  DEFINE VARIABLE cFileExt2 AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE cSaveDir AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cXrefFile AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE cStrXrefFile AS CHARACTER  NO-UNDO.
@@ -321,7 +320,6 @@ PROCEDURE compileXref.
   END.
   ELSE DO:
     RUN adecomm/_osprefx.p(INPUT ipOutFile, OUTPUT cBase2, OUTPUT cFile2).
-    RUN adecomm/_osfext.p(INPUT cFile2, OUTPUT cFileExt2).
     ASSIGN opError = NOT createDir(outputDir, cBase2).
     IF (opError) THEN RETURN.
     ASSIGN opError = NOT createDir(PCTDir, cBase2).
@@ -443,7 +441,8 @@ PROCEDURE compileXref.
   ASSIGN opError = COMPILER:ERROR.
   IF NOT opError THEN DO:
     /* In order to handle <mapper> element */
-    IF cRenameFrom NE '' THEN DO:
+    IF ((cRenameFrom NE '') AND (cRenameFrom NE ipOutFile)) THEN DO:
+      RUN logVerbose IN hSrcProc (SUBSTITUTE("Mapper: renaming &1/&2 to &1/&3", outputDir, cRenameFrom, ipOutFile)).
       OS-COPY VALUE(outputDir + '/' + cRenameFrom) VALUE(outputDir + '/' + ipOutFile).
       OS-DELETE VALUE(outputDir + '/' + cRenameFrom).
     END.
@@ -561,7 +560,6 @@ PROCEDURE importXmlXref.
   DEFINE INPUT  PARAMETER pcDir  AS CHARACTER NO-UNDO.
   DEFINE INPUT  PARAMETER pcFile AS CHARACTER NO-UNDO.
 
-  DEFINE VARIABLE cTmp      AS CHARACTER NO-UNDO.
   DEFINE VARIABLE zz        AS INTEGER NO-UNDO.
 
   EMPTY TEMP-TABLE ttXrefInc.
@@ -570,7 +568,7 @@ PROCEDURE importXmlXref.
 
   DATASET Cross-reference:READ-XML("FILE", pcXref, "EMPTY", ?, ?).
 
-  FOR EACH Reference WHERE LOOKUP(Reference-Type, 'INCLUDE,CREATE,REFERENCE,ACCESS,UPDATE,SEARCH,CLASS':U) NE 0:
+  FOR EACH Reference WHERE LOOKUP(Reference.Reference-Type, 'INCLUDE,CREATE,REFERENCE,ACCESS,UPDATE,SEARCH,CLASS':U) NE 0:
     ASSIGN Reference.Object-identifier = TRIM(Reference.Object-identifier).
     IF Reference.Reference-Type EQ 'INCLUDE' THEN DO:
       /* Extract include file name from field (which contains include parameters */
@@ -600,14 +598,14 @@ PROCEDURE importXmlXref.
   END.
 
   OUTPUT TO VALUE (pcDir + '/':U + pcFile + '.inc':U).
-  FOR EACH ttXrefInc BREAK BY ttIncName:
+  FOR EACH ttXrefInc BREAK BY ttXrefInc.ttIncName:
     IF FIRST-OF(ttXrefInc.ttIncName) THEN
       EXPORT ttXrefInc.ttIncName SEARCH(ttXrefInc.ttIncName).
   END.
   OUTPUT CLOSE.
 
   OUTPUT TO VALUE (pcDir + '/':U + pcFile + '.crc':U).
-  FOR EACH ttXrefCRC BREAK BY ttTblName:
+  FOR EACH ttXrefCRC BREAK BY ttXrefCRC.ttTblName:
     IF FIRST-OF(ttXrefCRC.ttTblName) THEN DO:
       FIND CRCList WHERE CRCList.ttTable EQ ttXrefCRC.ttTblName NO-LOCK NO-ERROR.
       IF (AVAILABLE CRCList) THEN DO:
@@ -669,7 +667,7 @@ PROCEDURE importXref PRIVATE.
   INPUT STREAM sXREF2 CLOSE.
 
   OUTPUT TO VALUE (pcDir + '/':U + pcFile + '.inc':U).
-  FOR EACH ttXref WHERE xRefType EQ 'INCLUDE':U NO-LOCK BREAK BY ttXref.xObjID:
+  FOR EACH ttXref WHERE ttXref.xRefType EQ 'INCLUDE':U NO-LOCK BREAK BY ttXref.xObjID:
     IF FIRST-OF (ttXref.xObjID) THEN
       EXPORT ttXref.xObjID SEARCH(ttXref.xObjID).
   END.
@@ -687,7 +685,7 @@ PROCEDURE importXref PRIVATE.
   OUTPUT CLOSE.
 
   OUTPUT TO VALUE (pcDir + '/':U + pcFile + '.hierarchy':U).
-  FOR EACH ttXref WHERE xRefType EQ 'CLASS':U NO-LOCK:
+  FOR EACH ttXref WHERE ttXref.xRefType EQ 'CLASS':U NO-LOCK:
     ASSIGN cTmp = ENTRY(2, ttXref.xObjID).
     IF cTmp BEGINS 'INHERITS ' THEN DO:
       ASSIGN cTmp = SUBSTRING(cTmp, 10). /* To remove INHERITS */
@@ -707,7 +705,7 @@ PROCEDURE importXref PRIVATE.
 
   IF RunList THEN DO:
     OUTPUT TO VALUE (pcDir + '/':U + pcFile + '.run':U).
-    FOR EACH ttXref WHERE xRefType EQ 'RUN':U AND ((ttXref.xObjID MATCHES '*~~.p') OR (ttXref.xObjID MATCHES '*~~.w')) NO-LOCK BREAK BY ttXref.xObjID:
+    FOR EACH ttXref WHERE ttXref.xRefType EQ 'RUN':U AND ((ttXref.xObjID MATCHES '*~~.p') OR (ttXref.xObjID MATCHES '*~~.w')) NO-LOCK BREAK BY ttXref.xObjID:
       IF FIRST-OF (ttXref.xObjID) THEN DO:
         FIND TimeStamps WHERE TimeStamps.ttFile EQ ttXref.xObjID NO-LOCK NO-ERROR.
         IF (NOT AVAILABLE TimeStamps) THEN DO:

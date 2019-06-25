@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2018 Riverside Software
+ * Copyright 2005-2019 Riverside Software
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -86,16 +86,6 @@ public class PCTCompile extends PCTRun {
         throw new BuildException("Can't set parameter attribute here");
     }
 
-    private boolean isDirInPropath(File dir) {
-        if (runAttributes.getPropath() == null)
-            return false;
-        for (String str : runAttributes.getPropath().list()) {
-            if (new File(str).equals(dir))
-                return true;
-        }
-        return false;
-    }
-
     /**
      * Generates text file with all files from resource collections
      */
@@ -175,8 +165,6 @@ public class PCTCompile extends PCTRun {
             bw.write("PCTDIR=" + compAttrs.getxRefDir().getAbsolutePath()); //$NON-NLS-1$
             bw.newLine();
             bw.write("FORCECOMPILE=" + (compAttrs.isForceCompile() ? 1 : 0)); //$NON-NLS-1$
-            bw.newLine();
-            bw.write("FAILONERROR=" + (runAttributes.isFailOnError() ? 1 : 0)); //$NON-NLS-1$
             bw.newLine();
             bw.write("STOPONERROR=" + (compAttrs.isStopOnError() ? 1 : 0)); //$NON-NLS-1$
             bw.newLine();

@@ -1,5 +1,5 @@
 /**
- * Copyright 2005-2018 Riverside Software
+ * Copyright 2005-2019 Riverside Software
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ RUN pct/compile.p PERSISTENT SET hComp.
 
 /** Parameters from ANT call */
 DEFINE VARIABLE Filesets  AS CHARACTER  NO-UNDO.
-DEFINE VARIABLE FailOnErr AS LOGICAL    NO-UNDO.
 DEFINE VARIABLE StopOnErr AS LOGICAL    NO-UNDO.
 
 /** Internal use */
@@ -57,8 +56,6 @@ REPEAT:
       ASSIGN Filesets = ENTRY(2, cLine, '=':U).
     WHEN 'STOPONERROR':U THEN
       ASSIGN StopOnErr = (ENTRY(2, cLine, '=':U) EQ '1':U).
-    WHEN 'FAILONERROR':U THEN
-      ASSIGN FailOnErr = (ENTRY(2, cLine, '=':U) EQ '1':U).
     OTHERWISE
       RUN setOption IN hComp (ENTRY(1, cLine, '=':U), ENTRY(2, cLine, '=':U)).
   END CASE.
