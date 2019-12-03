@@ -1243,7 +1243,7 @@ public class PCTCompileExtTest extends BuildFileTestNg {
         }
     }
 
-    @Test(groups = {"v10"})
+    @Test(groups = {"v11"})
     public void test79() {
         // No test case as 'outputType' attribute is not implemented in PCTCompileExt
     }
@@ -1326,7 +1326,7 @@ public class PCTCompileExtTest extends BuildFileTestNg {
         expectBuildException("test", "Crashed process should lead to build failure");
     }
 
-    @Test(groups = {"v10"})
+    @Test(groups = {"v11"})
     public void test83() {
         // No test case as 'outputType' attribute is not implemented in PCTCompileExt
     }

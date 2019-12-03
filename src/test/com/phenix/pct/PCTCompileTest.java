@@ -829,8 +829,6 @@ public class PCTCompileTest extends BuildFileTestNg {
                 return;
         } catch (IOException caught) {
             return;
-        } catch (InvalidRCodeException caught) {
-            return;
         }
 
         configureProject(BASEDIR + "test52/build.xml");
@@ -853,8 +851,6 @@ public class PCTCompileTest extends BuildFileTestNg {
             if ((version.getMajorVersion() == 11) && (version.getMinorVersion() <= 6))
                 return;
         } catch (IOException caught) {
-            return;
-        } catch (InvalidRCodeException caught) {
             return;
         }
 
@@ -952,8 +948,6 @@ public class PCTCompileTest extends BuildFileTestNg {
             if (version.getMajorVersion() < 11)
                 return;
         } catch (IOException caught) {
-            return;
-        } catch (InvalidRCodeException caught) {
             return;
         }
 
@@ -1209,8 +1203,6 @@ public class PCTCompileTest extends BuildFileTestNg {
                 return;
         } catch (IOException e) {
             return;
-        } catch (InvalidRCodeException e) {
-            return;
         }
 
         configureProject(BASEDIR + "test76/build.xml");
@@ -1232,8 +1224,6 @@ public class PCTCompileTest extends BuildFileTestNg {
             if ((version.getMajorVersion() == 11) && (version.getMinorVersion() <= 2))
                 return;
         } catch (IOException e) {
-            return;
-        } catch (InvalidRCodeException e) {
             return;
         }
 
@@ -1272,7 +1262,7 @@ public class PCTCompileTest extends BuildFileTestNg {
         }
     }
 
-    @Test(groups = {"v10"})
+    @Test(groups = {"v11"})
     public void test79() {
         // Only work with 11.7+
         try {
@@ -1441,8 +1431,6 @@ public class PCTCompileTest extends BuildFileTestNg {
                 return;
         } catch (IOException caught) {
             return;
-        } catch (InvalidRCodeException caught) {
-            return;
         }
 
         configureProject(BASEDIR + "test80/build.xml");
@@ -1487,7 +1475,7 @@ public class PCTCompileTest extends BuildFileTestNg {
         expectBuildException("test", "Crashed process should lead to build failure");
     }
 
-    @Test(groups = {"v10"})
+    @Test(groups = {"v11"})
     public void test83() {
         // Only work with 11.7+
         try {
