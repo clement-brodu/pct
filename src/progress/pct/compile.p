@@ -18,8 +18,10 @@
 /* Callbacks are only supported on 11.3+ */
  &IF DECIMAL(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.') + 1)) GE 11.3 &THEN
  USING Progress.Lang.Class.
- &ENDIF
  USING Progress.Json.ObjectModel.*.
+ &ENDIF 
+
+ 
 
 &IF INTEGER(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.'))) GE 11 &THEN
   { pct/v11/xrefd0004.i}
@@ -159,7 +161,7 @@ ASSIGN bAbove101 = majorMinor GT 10.1.
 ASSIGN bAboveEq113 = (majorMinor GE 11.3).
 ASSIGN bAboveEq117 = (majorMinor GE 11.7).
 &IF DECIMAL(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.') + 1)) GE 11 &THEN
-// PROVERSION(1) available since v11
+/* PROVERSION(1) available since v11 */
 ASSIGN bAboveEq1173 = (majorMinor GT 11.7) OR ((majorMinor EQ 11.7) AND (INTEGER(ENTRY(3, PROVERSION(1), '.')) GE 3)). /* FIXME Check exact version number */
 &ENDIF
 ASSIGN bAboveEq12 = (majorMinor GE 12).
@@ -567,6 +569,8 @@ PROCEDURE printErrorsWarningsJson.
 
   DEFINE INPUT PARAMETER iCompOK AS INTEGER NO-UNDO.
   DEFINE INPUT PARAMETER iCompFail AS INTEGER NO-UNDO.
+  /* Dans les version 10, ça ne fonctionne pas */
+  &IF DECIMAL(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.') + 1)) GE 11.3 &THEN
 
   DEFINE VARIABLE hResult AS handle NO-UNDO.
   DEFINE VARIABLE mptr AS MEMPTR NO-UNDO.
@@ -586,6 +590,8 @@ PROCEDURE printErrorsWarningsJson.
     dsJsonObj:WriteFile(outFile).
     SET-SIZE(mptr) = 0.
   END.
+
+  &ENDIF
 
 END PROCEDURE.
 
