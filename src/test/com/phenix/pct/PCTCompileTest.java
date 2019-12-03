@@ -1265,7 +1265,7 @@ public class PCTCompileTest extends BuildFileTestNg {
         }
     }
     
-    @Test(groups = {"v10"})
+    @Test(groups = {"v11"})
     public void test79() {
         String projectResultFile = BASEDIR + "test79/build/.pct/project-result.json";
 
