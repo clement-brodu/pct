@@ -321,11 +321,6 @@ public class PCTCompile extends PCTRun {
             log(Messages.getString("PCTCompile.92"), Project.MSG_WARN); //$NON-NLS-1$
         }
 
-        if (compAttrs.getOutputType() != null
-                && !"json".equalsIgnoreCase(compAttrs.getOutputType())) {
-            throw new BuildException(Messages.getString("PCTCompile.94"));
-        }
-
         checkDlcHome();
 
         try {
