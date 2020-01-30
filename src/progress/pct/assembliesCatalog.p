@@ -15,6 +15,9 @@
  *                                                                    *
  **********************************************************************/
 
+/* Compatibilité V10 */
+&IF INTEGER(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.'))) GE 11 &THEN
+
 BLOCK-LEVEL ON ERROR UNDO, THROW.
 
 USING Consultingwerk.PCT.AssembliesCatalog.* FROM PROPATH.
@@ -28,6 +31,7 @@ DEFINE VARIABLE oJson    AS JsonArray        NO-UNDO.
 { Consultingwerk/Studio/AssemblyParser/ttAssemblies.i }
 
 /* ***************************  Main Block  *************************** */
+
 
 MESSAGE "Generating assemblies catalog".
 oParser = NEW AssemblyParser() .
@@ -43,3 +47,9 @@ END.
 
 oJson:WriteFile (SESSION:PARAMETER, TRUE) .
 RETURN '0'.
+
+
+&ELSEIF INTEGER(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.'))) GE 10 &THEN
+  MESSAGE "Utilisation Impossible en V10".
+  RETURN '1'
+&ENDIF
