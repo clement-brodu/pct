@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="lib/byte-buddy-agent-1.9.14.jar"/>
 	<classpathentry kind="lib" path="lib/hamcrest-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/objenesis-2.6.jar"/>
+	<classpathentry kind="lib" path="lib/rcode-reader-2.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<project name="CheckRCode-test1">
+
+	<taskdef resource="PCT.properties" />
+
+    <target name="test">
+    	   	
+    	<CheckRCode >
+    		 <fileset dir="rcode" includes="**/*.r" />
+		</CheckRCode>
+   	</target>
+
+</project>

@@ -92,7 +92,7 @@
     <pathelement location="lib/gson-2.2.4.jar" />
     <pathelement location="lib/ast.jar" />
     <pathelement location="lib/ast-dependencies.jar" />
-
+  	<pathelement location="lib/rcode-reader-2.5.1.jar" />
     <!-- ABLDuck classes -->
     <pathelement location="lib/commonmark-0.11.0.jar"/>
   </path>
@@ -330,7 +330,8 @@
         <include name="za/co/mip/ablduck/resources/ablduck.zip" />
       </fileset>
       <zipfileset src="lib/gson-2.2.4.jar" />
-
+        
+	  <zipfileset src="lib/rcode-reader-2.5.1.jar" />
       <!-- ABLDuck classes -->
       <zipfileset src="lib/commonmark-0.11.0.jar"/>
 
