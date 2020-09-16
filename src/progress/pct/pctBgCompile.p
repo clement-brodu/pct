@@ -63,8 +63,10 @@ PROCEDURE setOptions:
     RUN setOption IN hComp ('OUTPUTTYPE', ENTRY(36, ipPrm, ';')).
     RUN setOption IN hComp ('RETURNVALUES', ENTRY(37, ipPrm, ';')).
 
-    /* Penser à incrémenter */
+    /* Penser Ã  incrÃ©menter */
     RUN setOption IN hComp ('PCTRCODE', IF ENTRY(38, ipPrm, ';') EQ 'true' THEN '1' ELSE '0').
+    RUN setOption IN hComp ('TEMPOUTPUT', ENTRY(39, ipPrm, ';')).
+    
     RUN initModule IN hComp.
 
     ASSIGN opOk = TRUE.
