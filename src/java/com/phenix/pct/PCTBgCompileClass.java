@@ -22,24 +22,12 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.types.Mapper;
-import org.apache.tools.ant.types.Path;
-import org.apache.tools.ant.types.Resource;
-import org.apache.tools.ant.types.ResourceCollection;
-import org.apache.tools.ant.types.resources.FileResource;
-import org.apache.tools.ant.util.FileUtils;
 
-import com.phenix.pct.PCTBgCompile.CompilationBackgroundWorker;
 
 /**
  * Class for compiling Progress procedures
@@ -67,6 +55,11 @@ public class PCTBgCompileClass extends PCTBgCompile {
         return worker;
     }
     
+    protected synchronized void logMessage(String message, int level) {
+        
+        log(message, level);
+        
+    }
 
     @Override
     protected void cleanup() {
@@ -108,6 +101,7 @@ public class PCTBgCompileClass extends PCTBgCompile {
                 
                 StringBuilder sb = new StringBuilder();
                 if (noMoreFiles) {
+                    sendCommand("waitForCopy", ""); // fake command to avoid timeout
                     copyMyFiles();
                     return false;
                 } else {
@@ -122,6 +116,17 @@ public class PCTBgCompileClass extends PCTBgCompile {
                 }
             } else {
                 return super.performCustomAction();
+            }
+        }
+                
+        @Override
+        public void handleResponse(String command, String parameter, boolean err,
+                String customResponse, List<Message> returnValues) {
+
+            super.handleResponse(command, parameter, err, customResponse, returnValues);
+            
+            if (command.equalsIgnoreCase("waitForCopy")) {   
+                logMessage("Waiting for class copy...", Project.MSG_VERBOSE);
             }
         }
         
