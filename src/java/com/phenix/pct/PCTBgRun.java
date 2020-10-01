@@ -710,10 +710,10 @@ public abstract class PCTBgRun extends PCT implements IRunAttributes {
                     }
                 }
             } catch (InterruptedException caught) {
-                if (!shouldHideTimeout())
+                //if (!shouldHideTimeout())
                     setBuildException(caught);
-                else
-                    log("Timout Exception...", Project.MSG_WARN);
+                //else
+                    //log("Timout Exception...", Project.MSG_WARN);
             }
 
         }
