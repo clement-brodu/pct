@@ -74,7 +74,13 @@ public class PCTBgCompileClass extends PCTBgCompile {
         // Suppression du répertoire temporaire
         deleteDirectory(Paths.get(compAttrs.getDestDir() == null ? "" : compAttrs.getDestDir().getAbsolutePath(), TEMPCOMPDIR).toFile());
     }
-
+    
+    @Override 
+    protected boolean shouldHideTimeout() {
+        synchronized(units) {
+            return units.isEmpty();
+        }
+    }
     public class CompilationClassBackgroundWorker extends CompilationBackgroundWorker {
         private java.nio.file.Path tempPath;
         List<CompilationUnit> myUnits = new ArrayList<>();
