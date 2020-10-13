@@ -55,7 +55,7 @@ EternalLoop:
 DO WHILE aOk:
     IF VALID-HANDLE(hSocket) THEN DO:
         ASSIGN aResp = FALSE.
-        WAIT-FOR READ-RESPONSE OF hSocket PAUSE 10.
+        WAIT-FOR READ-RESPONSE OF hSocket PAUSE 20. /* Increase from 10 to 20 for cls compilation */
         IF NOT aResp THEN LEAVE EternalLoop.
     END.
 END.
@@ -68,7 +68,7 @@ PROCEDURE ConnectToServer.
     DEFINE VARIABLE packetBuffer AS MEMPTR      NO-UNDO.
     
     ASSIGN aOk = hSocket:CONNECT("-H localhost -S " + portNumber) NO-ERROR.
-    if NOT aOK THEN DO:
+    IF NOT aOK THEN DO:
         RETURN ERROR "Connection to ANT failed on port " + portNumber.
     END.
     ELSE DO:
@@ -95,7 +95,7 @@ PROCEDURE WriteToSocket:
     DEFINE INPUT  PARAMETER pcResp AS CHARACTER NO-UNDO.
 
     DEFINE VARIABLE packetBuffer AS MEMPTR   NO-UNDO.
-    DEFINE VARIABLE packet       as longchar no-undo.
+    DEFINE VARIABLE packet       AS LONGCHAR NO-UNDO.
 
     ASSIGN packet = (IF plok THEN "OK" ELSE "ERR") + ":" + pcResp + "~n".
     FOR EACH ttMsgs:
