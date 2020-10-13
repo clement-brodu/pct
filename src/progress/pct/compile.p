@@ -477,7 +477,7 @@ PROCEDURE compileXref.
     END.
   END.
 &ENDIF
-
+  RUN logVerbose IN hSrcProc (SUBSTITUTE("Debug : Compilation -> &1 ; &2 ; &3 ; &4 ; &5 ; &6 ; &7 ", IF lRelative THEN ipInFile ELSE ipInDir + '/':U + ipInFile, cSaveDir, debugListingFile, IF Lst AND NOT LstPrepro THEN PCTDir + '/':U + ipInFile ELSE ?, preprocessFile, cStrXrefFile, cXrefFile )).
   RUN pctcomp.p (IF lRelative THEN ipInFile ELSE ipInDir + '/':U + ipInFile,
                  cSaveDir, debugListingFile,
                  IF Lst AND NOT LstPrepro THEN PCTDir + '/':U + ipInFile ELSE ?,

@@ -545,8 +545,10 @@ public class CompilationAttributes implements ICompilationAttributes {
                     bw.write("PAGE-SIZE " + getPageSize() + " ");
                 if (getPageWidth() != -1)
                     bw.write("PAGE-WIDTH " + getPageWidth() + " ");
-                bw.write("PREPROCESS VALUE(ipPreprocess) ");
-                bw.write("STRING-XREF VALUE(ipStrXref) ");
+                if (this.isPreprocess())
+                    bw.write("PREPROCESS VALUE(ipPreprocess) ");
+                if (this.isStringXref())
+                    bw.write("STRING-XREF VALUE(ipStrXref) ");
                 if (isAppendStringXref())
                     bw.write("APPEND ");
                 if (isXmlXref())
