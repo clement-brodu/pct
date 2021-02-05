@@ -68,6 +68,23 @@ pipeline {
       }
     }
   }
+
+  post {
+    success {
+      script {
+        println 'Success'
+      }
+    }
+    failure {
+      script {
+        println 'Failure'
+      }
+    }
+    always {
+      echo 'Delete Workspace'
+      deleteDir()
+    }
+  }
 }
 
 def testBranch(dlc, dlcVersion, stashCoverage, label) {
