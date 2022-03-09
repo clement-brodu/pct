@@ -103,11 +103,10 @@ public class PCTBgCompileClass extends PCTBgCompile {
                         noMoreFiles = true;
                     }
                 }
-                // Remember classes units
-                myUnits.addAll(sending);
                 
                 StringBuilder sb = new StringBuilder();
                 if (noMoreFiles) {
+                    // copy already compiled class to outputdir
                     copyMyFiles();
                     return false;
                 } else {
@@ -118,6 +117,10 @@ public class PCTBgCompileClass extends PCTBgCompile {
                         sb.append(cu.toString());
                     }
                     sendCommand("PctCompile", sb.toString());
+                    // copy already compiled class to outputdir
+                    copyMyFiles();
+                    // Remember classes units
+                    myUnits.addAll(sending);
                     return true;
                 }
             } else {
@@ -152,6 +155,8 @@ public class PCTBgCompileClass extends PCTBgCompile {
                     }
                 }       
             }
+            // On vide les units déja copiées
+            myUnits.clear();
             
             
         }
