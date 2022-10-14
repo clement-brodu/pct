@@ -149,6 +149,7 @@ public class PCTBgCompileClass extends PCTBgCompile {
                         log("Copie -> " + vSourceFile + " - " + vDestFile, Project.MSG_VERBOSE);
                         File vDir = new File(vDestFile.getParent().toString());
                         if (!vDir.exists()) vDir.mkdirs();
+                        sleep(10);
                         Files.copy(vSourceFile, vDestFile, StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
                         log("Pas de fichier", e, Project.MSG_DEBUG);
@@ -159,6 +160,14 @@ public class PCTBgCompileClass extends PCTBgCompile {
             myUnits.clear();
             
             
+        }
+
+        private void sleep (int millis) {
+            try {
+                Thread.sleep(millis);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
         }
 
         @Override
