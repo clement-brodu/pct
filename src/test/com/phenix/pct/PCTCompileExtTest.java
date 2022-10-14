@@ -37,6 +37,13 @@ public class PCTCompileExtTest extends PCTCompileTest {
     String getBaseDir() {
         return "PCTCompileExt/";
     }
+    @Override
+    @Test(groups = {"v10"})
+    public void test22() {
+        // Parent class are not compiled with PCTCompileExt
+        test22_internal(false); 
+    }
+
 
     // ResultProperty is meaningless in multi-threaded builds
     @Override
