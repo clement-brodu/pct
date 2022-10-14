@@ -90,6 +90,7 @@ FUNCTION CheckCRC RETURNS LOGICAL (INPUT f AS CHARACTER, INPUT d AS CHARACTER) F
 FUNCTION CheckHierarchy RETURNS LOGICAL (INPUT f AS CHARACTER, INPUT ts AS DATETIME, INPUT d AS CHARACTER) FORWARD.
 FUNCTION fileExists RETURNS LOGICAL (INPUT f AS CHARACTER) FORWARD.
 FUNCTION createDir RETURNS LOGICAL (INPUT base AS CHARACTER, INPUT d AS CHARACTER) FORWARD.
+FUNCTION createDirRecursive RETURNS LOGICAL (INPUT dirToCreate AS CHARACTER) FORWARD.
 FUNCTION CheckPctRcode RETURNS LOGICAL (INPUT f AS CHARACTER, INPUT TS AS DATETIME, INPUT d AS CHARACTER) FORWARD.
 
 /** Named streams */
@@ -144,7 +145,7 @@ DEFINE VARIABLE lOutputJson    AS LOGICAL NO-UNDO.
 DEFINE VARIABLE lOutputConsole AS LOGICAL NO-UNDO.
 
 DEFINE VARIABLE lPctRcode AS LOGICAL    NO-UNDO INITIAL FALSE.
-
+DEFINE VARIABLE cTempOutput AS CHARACTER NO-UNDO.
 
 /* Handle to calling procedure in order to log messages */
 DEFINE VARIABLE hSrcProc AS HANDLE NO-UNDO.
@@ -208,6 +209,7 @@ PROCEDURE setOption:
     WHEN 'OUTPUTTYPE':U       THEN ASSIGN outputType = ipValue.
 
     WHEN 'PCTRCODE':U         THEN ASSIGN lPctRcode = (ipValue EQ '1':U).
+    WHEN 'TEMPOUTPUT':U       THEN ASSIGN cTempOutput = ipValue.
     
     OTHERWISE RUN logError IN hSrcProc (SUBSTITUTE("Unknown parameter '&1' with value '&2'" ,ipName, ipValue)).
   END CASE.
@@ -346,6 +348,9 @@ PROCEDURE compileXref:
   DEFINE VARIABLE lWarnings AS LOGICAL NO-UNDO.
   DEFINE VARIABLE lOneWarning AS LOGICAL NO-UNDO.
 
+  DEFINE VARIABLE vOutputTempDir AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE vOutputTempDirRetry AS CHARACTER NO-UNDO.
+
   EMPTY TEMP-TABLE ttWarnings. /* Emptying the temp-table to store warnings for current file*/
   /* Output progress */
   IF ProgPerc GT 0 THEN DO:
@@ -372,15 +377,26 @@ PROCEDURE compileXref:
 
   RUN adecomm/_osprefx.p(INPUT ipInFile, OUTPUT cBase, OUTPUT cFile).
   RUN adecomm/_osfext.p(INPUT cFile, OUTPUT cFileExt).
-  ASSIGN opError = NOT createDir(outputDir, cBase).
+
+  /* Compile class in temp OutputDir if defined */
+  vOutputTempDir = IF cTempOutput > "" AND LC(cFileExt) = ".cls" THEN cTempOutput ELSE OutputDir. 
+  ASSIGN opError = NOT createDir(vOutputTempDir, cBase).
   IF (opError) THEN RETURN.
+  /* use a retry directory if compile in .pctcomp */
+  IF ipInFile MATCHES "*~~.cls":U AND REPLACE(vOutputTempDir, CHR(92), '/':U) MATCHES "*/~~.pctcomp/*" THEN
+  DO:
+    ASSIGN
+      vOutputTempDirRetry = vOutputTempDir + "-retry"
+      opError = NOT createDirRecursive(vOutputTempDirRetry).
+    IF (opError) THEN RETURN.
+  END.
   ASSIGN opError = NOT createDir(PCTDir, cBase).
   IF (opError) THEN RETURN.
   ASSIGN cSaveDir = (IF DestDir EQ ?
                        THEN ?
                        ELSE (IF cFileExt = ".cls":U OR lRelative
-                               THEN outputDir
-                               ELSE outputDir + '/':U + cBase)).
+                               THEN vOutputTempDir
+                               ELSE vOutputTempDir + '/':U + cBase)).
 
   IF (ipOutFile EQ ?) OR (ipOutFile EQ '') THEN DO:
     ASSIGN ipOutFile = SUBSTRING(ipInFile, 1, R-INDEX(ipInFile, cFileExt) - 1) + '.r':U.
@@ -510,6 +526,22 @@ PROCEDURE compileXref:
                  IF Lst AND NOT LstPrepro THEN PCTDir + '/':U + ipInFile ELSE ?,
                  preprocessFile, cStrXrefFile, cXrefFile, IF bAboveEq1173 THEN cOpts ELSE "").
 
+  /* If first failed, try again in other temp directory, just in case this is OE bug with class */
+  IF COMPILER:ERROR AND vOutputTempDirRetry > "" THEN
+  DO:
+    RUN pctcomp.p (IF lRelative THEN ipInFile ELSE ipInDir + '/':U + ipInFile,
+                    vOutputTempDirRetry, debugListingFile,
+                    IF Lst AND NOT LstPrepro THEN PCTDir + '/':U + ipInFile ELSE ?,
+                    preprocessFile, cStrXrefFile, cXrefFile, IF bAboveEq1173 THEN cOpts ELSE "").
+    IF NOT COMPILER:ERROR THEN
+    DO:
+      OS-COPY VALUE(vOutputTempDirRetry + '/' + ipOutFile) VALUE(vOutputTempDir + '/' + ipOutFile).
+      /* if copy failed, considered compilation failed */
+      COMPILER:ERROR = OS-ERROR <> 0. 
+      OS-DELETE VALUE(vOutputTempDirRetry + '/' + ipOutFile).
+    END.
+  END.
+
 &IF DECIMAL(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.') + 1)) GE 11.3 &THEN
   IF VALID-OBJECT(callback) THEN callback:afterCompile(hSrcProc, ipInFile, ipInDir).
 &ENDIF
@@ -519,8 +551,8 @@ PROCEDURE compileXref:
     /* In order to handle <mapper> element */
     IF ((cRenameFrom NE '') AND (cRenameFrom NE ipOutFile)) THEN DO:
       RUN logVerbose IN hSrcProc (SUBSTITUTE("Mapper: renaming &1/&2 to &1/&3", outputDir, cRenameFrom, ipOutFile)).
-      OS-COPY VALUE(outputDir + '/' + cRenameFrom) VALUE(outputDir + '/' + ipOutFile).
-      OS-DELETE VALUE(outputDir + '/' + cRenameFrom).
+      OS-COPY VALUE(vOutputTempDir + '/' + cRenameFrom) VALUE(vOutputTempDir + '/' + ipOutFile).
+      OS-DELETE VALUE(vOutputTempDir + '/' + cRenameFrom).
     END.
     IF (NOT noParse) AND (NOT lXCode) THEN DO:
       IF lXmlXref THEN
@@ -1092,5 +1124,44 @@ FUNCTION createDir RETURNS LOGICAL (INPUT base AS CHARACTER, INPUT d AS CHARACTE
     END.
   END.
   RETURN TRUE.
+
+END FUNCTION.
+
+FUNCTION createDirRecursive RETURNS LOGICAL (INPUT dirToCreate AS CHARACTER):
+  DEFINE VARIABLE i AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE c AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE currentDir AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE baseDir AS CHARACTER  NO-UNDO.
+
+  dirToCreate = REPLACE(dirToCreate, CHR(92), '/':U).
+
+  IF fileExists(dirToCreate) THEN
+    RETURN TRUE.
+
+  dirLevel:
+  DO i = 1 TO NUM-ENTRIES(dirToCreate, '/':U) :
+    ASSIGN 
+      baseDir = currentDir
+      c = ENTRY(i, dirToCreate, '/':U)
+      currentDir = currentDir + c + '/':U.
+
+    IF fileExists(currentDir) THEN
+      NEXT dirLevel.
+
+    OS-CREATE-DIR VALUE(currentDir).
+    IF (OS-ERROR EQ 0) OR (OS-ERROR EQ 999) THEN DO:
+      /* Issue #200: error code 999 is sometimes sent when 2 processes want to create dir at the same time */
+      CREATE ttDirs.
+      ASSIGN 
+            ttDirs.baseDir = RIGHT-TRIM(baseDir, '/':U)
+            ttDirs.dirName = c.
+    END.
+    ELSE DO:
+      RUN logError IN hSrcProc (SUBSTITUTE("Unable to create directory '&1' - Err &2", c, OS-ERROR)).
+      RETURN FALSE.
+    END.
+  END.
+
+  RETURN YES.
 
 END FUNCTION.
