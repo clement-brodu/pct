@@ -145,7 +145,7 @@ DEFINE VARIABLE lOutputJson    AS LOGICAL NO-UNDO INITIAL FALSE.
 DEFINE VARIABLE lOutputConsole AS LOGICAL NO-UNDO INITIAL FALSE.
 
 DEFINE VARIABLE lPctRcode AS LOGICAL    NO-UNDO INITIAL FALSE.
-
+DEFINE VARIABLE cTempOutput AS CHARACTER NO-UNDO.
 
 /* Handle to calling procedure in order to log messages */
 DEFINE VARIABLE hSrcProc AS HANDLE NO-UNDO.
@@ -178,7 +178,7 @@ PROCEDURE setOption.
   DEFINE INPUT PARAMETER ipValue AS CHARACTER NO-UNDO.
 
   CASE ipName:
-    when 'OUTPUTDIR':U        THEN ASSIGN DestDir = ipValue.
+    WHEN 'OUTPUTDIR':U        THEN ASSIGN DestDir = ipValue.
     WHEN 'PCTDIR':U           THEN ASSIGN PCTDir = ipValue.
     WHEN 'FORCECOMPILE':U     THEN ASSIGN ForceComp = (ipValue EQ '1':U).
     WHEN 'XCODE':U            THEN ASSIGN lXCode = (ipValue EQ '1':U).
@@ -209,6 +209,7 @@ PROCEDURE setOption.
     WHEN 'OUTPUTTYPE':U       THEN ASSIGN outputType = ipValue.
 
     WHEN 'PCTRCODE':U         THEN ASSIGN lPctRcode = (ipValue EQ '1':U).
+    WHEN 'TEMPOUTPUT':U       THEN ASSIGN cTempOutput = ipValue.
     
     OTHERWISE RUN logError IN hSrcProc (SUBSTITUTE("Unknown parameter '&1' with value '&2'" ,ipName, ipValue)).
   END CASE.
@@ -249,7 +250,7 @@ PROCEDURE initModule:
     RETURN RETURN-VALUE.
 
   /* Checks if valid config */
-  OutputDir = if DestDir ne ? then DestDir else ".".
+  OutputDir = IF DestDir NE ? THEN DestDir ELSE ".".
   IF NOT FileExists(OutputDir) THEN
     RETURN '4'.
   IF NOT FileExists(PCTDir) THEN
@@ -325,7 +326,9 @@ PROCEDURE compileXref.
   DEFINE VARIABLE ProcTS    AS DATETIME   NO-UNDO.
   DEFINE VARIABLE cRenameFrom AS CHARACTER NO-UNDO INITIAL ''.
   DEFINE VARIABLE lWarnings AS LOGICAL NO-UNDO INITIAL FALSE.
-  DEFINE VARIABLE lOneWarning AS LOGICAL NO-UNDO INITIAL FALSE.
+  DEFINE VARIABLE lOneWarning AS LOGICAL NO-UNDO.
+
+  DEFINE VARIABLE vOutputTempDir AS CHARACTER NO-UNDO.
 
   EMPTY TEMP-TABLE ttWarnings. /* Emptying the temp-table to store warnings for current file*/
   /* Output progress */
@@ -353,15 +356,19 @@ PROCEDURE compileXref.
 
   RUN adecomm/_osprefx.p(INPUT ipInFile, OUTPUT cBase, OUTPUT cFile).
   RUN adecomm/_osfext.p(INPUT cFile, OUTPUT cFileExt).
-  ASSIGN opError = NOT createDir(outputDir, cBase).
+
+  /* Compile class in temp OutputDir if defined */
+  vOutputTempDir = IF cTempOutput > "" AND LC(cFileExt) = ".cls" THEN cTempOutput ELSE OutputDir. 
+
+  ASSIGN opError = NOT createDir(vOutputTempDir, cBase).
   IF (opError) THEN RETURN.
   ASSIGN opError = NOT createDir(PCTDir, cBase).
   IF (opError) THEN RETURN.
   ASSIGN cSaveDir = (IF DestDir EQ ?
                        THEN ?
                        ELSE (IF cFileExt = ".cls":U OR lRelative
-                               THEN outputDir
-                               ELSE outputDir + '/':U + cBase)).
+                               THEN vOutputTempDir
+                               ELSE vOutputTempDir + '/':U + cBase)).
 
   IF (ipOutFile EQ ?) OR (ipOutFile EQ '') THEN DO:
     ASSIGN ipOutFile = SUBSTRING(ipInFile, 1, R-INDEX(ipInFile, cFileExt) - 1) + '.r':U.
@@ -381,7 +388,7 @@ PROCEDURE compileXref.
   ELSE DO:
     /* Does .r file exists ?,
        if DestDir = unknown rcode will be located in the same directory as the source : ipInDir */
-    ASSIGN RCodeTS = getTimeStampDF(if DestDir = ? then ipInDir else OutputDir, ipOutFile).
+    ASSIGN RCodeTS = getTimeStampDF(IF DestDir = ? THEN ipInDir ELSE OutputDir, ipOutFile).
     IF (RCodeTS EQ ?) THEN DO:
       opComp = 1.
     END.
@@ -500,8 +507,8 @@ PROCEDURE compileXref.
     /* In order to handle <mapper> element */
     IF ((cRenameFrom NE '') AND (cRenameFrom NE ipOutFile)) THEN DO:
       RUN logVerbose IN hSrcProc (SUBSTITUTE("Mapper: renaming &1/&2 to &1/&3", outputDir, cRenameFrom, ipOutFile)).
-      OS-COPY VALUE(outputDir + '/' + cRenameFrom) VALUE(outputDir + '/' + ipOutFile).
-      OS-DELETE VALUE(outputDir + '/' + cRenameFrom).
+      OS-COPY VALUE(vOutputTempDir + '/' + cRenameFrom) VALUE(vOutputTempDir + '/' + ipOutFile).
+      OS-DELETE VALUE(vOutputTempDir + '/' + cRenameFrom).
     END.
     IF (NOT noParse) AND (NOT lXCode) THEN DO:
       IF lXmlXref THEN
@@ -530,9 +537,9 @@ PROCEDURE compileXref.
           CREATE ttProjectWarnings.
           ASSIGN ttProjectWarnings.msgNum       = ttWarnings.msgNum
                  ttProjectWarnings.rowNum       = ttWarnings.rowNum
-                 ttProjectWarnings.fileName     = REPLACE(ttWarnings.fileName, chr(92), '/')
+                 ttProjectWarnings.fileName     = REPLACE(ttWarnings.fileName, CHR(92), '/')
                  ttProjectWarnings.msg          = ttWarnings.msg
-                 ttProjectWarnings.mainFileName = REPLACE(ipInDir + (if ipInDir eq '':U then '':U else '/':U) + ipInFile, chr(92), '/').
+                 ttProjectWarnings.mainFileName = REPLACE(ipInDir + (IF ipInDir EQ '':U THEN '':U ELSE '/':U) + ipInFile, CHR(92), '/').
         END.
       END.
       IF lOutputConsole THEN DO:
@@ -569,8 +576,8 @@ PROCEDURE compileXref.
     IF lOutputJson THEN DO:
       FOR EACH ttErrors:
         CREATE ttProjectErrors.
-        ASSIGN ttProjectErrors.fileName      = REPLACE(ttErrors.fileName, chr(92), '/')
-               ttProjectErrors.mainFileName  = REPLACE(ipInDir + (if ipInDir eq '':U then '':U else '/':U) + ipInFile, chr(92), '/')
+        ASSIGN ttProjectErrors.fileName      = REPLACE(ttErrors.fileName, CHR(92), '/')
+               ttProjectErrors.mainFileName  = REPLACE(ipInDir + (IF ipInDir EQ '':U THEN '':U ELSE '/':U) + ipInFile, CHR(92), '/')
                ttProjectErrors.rowNum        = ttErrors.rowNum
                ttProjectErrors.colNum        = ttErrors.colNum
                ttProjectErrors.msg           = ttErrors.msg.
