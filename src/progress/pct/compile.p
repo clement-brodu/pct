@@ -90,6 +90,7 @@ FUNCTION CheckCRC RETURNS LOGICAL (INPUT f AS CHARACTER, INPUT d AS CHARACTER) F
 FUNCTION CheckHierarchy RETURNS LOGICAL (INPUT f AS CHARACTER, INPUT ts AS DATETIME, INPUT d AS CHARACTER) FORWARD.
 FUNCTION fileExists RETURNS LOGICAL (INPUT f AS CHARACTER) FORWARD.
 FUNCTION createDir RETURNS LOGICAL (INPUT base AS CHARACTER, INPUT d AS CHARACTER) FORWARD.
+FUNCTION CheckPctRcode RETURNS LOGICAL (INPUT f AS CHARACTER, INPUT TS AS DATETIME, INPUT d AS CHARACTER) FORWARD.
 
 /** Named streams */
 DEFINE STREAM sXref.
@@ -141,6 +142,9 @@ DEFINE VARIABLE cLastIncludeName AS CHARACTER NO-UNDO.
 
 DEFINE VARIABLE lOutputJson    AS LOGICAL NO-UNDO.
 DEFINE VARIABLE lOutputConsole AS LOGICAL NO-UNDO.
+
+DEFINE VARIABLE lPctRcode AS LOGICAL    NO-UNDO INITIAL FALSE.
+
 
 /* Handle to calling procedure in order to log messages */
 DEFINE VARIABLE hSrcProc AS HANDLE NO-UNDO.
@@ -203,6 +207,8 @@ PROCEDURE setOption:
     WHEN 'CALLBACKCLASS':U    THEN ASSIGN callbackClass = ipValue.
     WHEN 'OUTPUTTYPE':U       THEN ASSIGN outputType = ipValue.
 
+    WHEN 'PCTRCODE':U         THEN ASSIGN lPctRcode = (ipValue EQ '1':U).
+    
     OTHERWISE RUN logError IN hSrcProc (SUBSTITUTE("Unknown parameter '&1' with value '&2'" ,ipName, ipValue)).
   END CASE.
 
@@ -310,6 +316,7 @@ FUNCTION getRecompileLabel RETURNS CHARACTER (ipVal AS INTEGER):
     WHEN 4 THEN RETURN 'Table CRC'.
     WHEN 5 THEN RETURN 'XCode or force'.
     WHEN 6 THEN RETURN 'Hierarchy change'.
+    WHEN 7 THEN RETURN 'Not a PCT rcode'.
     OTHERWISE   RETURN '???'.
   END.
 END FUNCTION.
@@ -414,6 +421,11 @@ PROCEDURE compileXref:
           ELSE DO:
             IF CheckHierarchy(ipInFile, RCodeTS, PCTDir) THEN DO:
               opComp = 6. /* Hierarchy change */
+            END.
+            ELSE DO:
+              IF lPctRcode AND CheckPctRcode (ipInFile, RCodeTS, PCTDir) THEN DO:
+                opComp = 7.
+              END.
             END.
           END.
         END.
@@ -934,6 +946,18 @@ END FUNCTION.
 FUNCTION getTimeStampF RETURNS DATETIME (INPUT f AS CHARACTER):
   ASSIGN FILE-INFO:FILE-NAME = f.
   RETURN DATETIME(FILE-INFO:FILE-MOD-DATE, FILE-INFO:FILE-MOD-TIME * 1000).
+END FUNCTION.
+
+FUNCTION CheckPctRcode RETURNS LOGICAL (INPUT f AS CHARACTER, INPUT ts AS DATETIME, INPUT d AS CHARACTER).
+  
+  FILE-INFO:FILE-NAME = d + '/':U + f + '.inc':U.
+  IF FILE-INFO:FULL-PATHNAME <> ? THEN DO:
+    /* if Rcode is newer than .inc (sometime it's equal, but not always) */
+    RETURN (getTimeStampF(FILE-INFO:FULL-PATHNAME) < ts). 
+  END.
+  
+  RETURN TRUE. /* Default is True */
+
 END FUNCTION.
 
 FUNCTION CheckIncludes RETURNS LOGICAL (INPUT f AS CHARACTER, INPUT ts AS DATETIME, INPUT d AS CHARACTER):

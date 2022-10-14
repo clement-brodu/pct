@@ -62,6 +62,8 @@ PROCEDURE setOptions:
   RUN setOption IN hComp ('OUTPUTTYPE', ENTRY(36, ipPrm, ';')).
   RUN setOption IN hComp ('RETURNVALUES', IF ENTRY(37, ipPrm, ';') EQ 'true' THEN '1' ELSE '0').
 
+  /* Penser à incrémenter */
+  RUN setOption IN hComp ('PCTRCODE', IF ENTRY(38, ipPrm, ';') EQ 'true' THEN '1' ELSE '0').
   RUN initModule IN hComp.
 
   ASSIGN opOk = TRUE.

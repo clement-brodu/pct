@@ -323,6 +323,11 @@ public class CompilationWrapper extends PCT implements IRunAttributes, ICompilat
     public void setDisplayFiles(int display) {
         compAttributes.setDisplayFiles(display);
     }
+    
+    @Override
+    public void setPctRcode(boolean pctRcode) {
+        compAttributes.setPctRcode(pctRcode);
+    }
 
     @Override
     public void setCallbackClass(String callback) {
