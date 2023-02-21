@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -663,9 +664,17 @@ public abstract class PCTBgRun extends PCT implements IRunAttributes {
             ExecutorService group = Executors.newFixedThreadPool(numThreads);
             for (int zz = 0; zz < numThreads; zz++) {
                 group.execute(() -> {
-                    final Socket socket;
+                    Socket socket;
                     try {
-                        socket = server.accept();
+                        try{
+                            socket = server.accept();
+                        }
+                        catch (SocketException uncaught) {
+                            // It could failed a first time with 
+                            // SocketException: Resource temporarily unavailable
+                            // so we retry one time, and if it failed again, it's an error
+                            socket = server.accept();
+                        }
                     } catch (IOException caught) {
                         setBuildException(caught);
                         return;
