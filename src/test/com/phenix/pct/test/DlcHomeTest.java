@@ -25,7 +25,7 @@ import com.phenix.pct.DlcHome;
 
 public class DlcHomeTest extends BuildFileTestNg {
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test1() throws XPathExpressionException {
         configureProject("DlcHome/test1/build.xml");
         executeTarget("test");
@@ -33,7 +33,7 @@ public class DlcHomeTest extends BuildFileTestNg {
         executeTarget("test2");
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test2() throws XPathExpressionException {
         configureProject("DlcHome/test2/build.xml");
         executeTarget("test");

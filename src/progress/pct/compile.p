@@ -19,8 +19,11 @@
 &IF DECIMAL(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.') + 1)) GE 11.3 &THEN
 USING Progress.Lang.Class.
 &ENDIF
+
+&IF INTEGER(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.'))) GE 11 &THEN
 USING Progress.Json.ObjectModel.JsonArray.
 USING Progress.Json.ObjectModel.JsonObject.
+&ENDIF
 
 &IF INTEGER(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.'))) GE 11 &THEN
   { pct/v11/xrefd0005.i}
@@ -161,7 +164,7 @@ ASSIGN majorMinor = DECIMAL(REPLACE(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '
 ASSIGN bAboveEq113 = (majorMinor GE 11.3).
 ASSIGN bAboveEq117 = (majorMinor GE 11.7).
 &IF DECIMAL(SUBSTRING(PROVERSION, 1, INDEX(PROVERSION, '.') + 1)) GE 11 &THEN
-// PROVERSION(1) available since v11
+/* PROVERSION(1) available since v11 */
 ASSIGN bAboveEq1173 = (majorMinor GT 11.7) OR ((majorMinor EQ 11.7) AND (INTEGER(ENTRY(3, PROVERSION(1), '.')) GE 3)). /* FIXME Check exact version number */
 &ENDIF
 ASSIGN bAboveEq12 = (majorMinor GE 12).
@@ -474,7 +477,7 @@ PROCEDURE compileXref:
   END.
   ELSE
     ASSIGN preprocessFile = ?.
-  // Check we don't overwrite source file (as preprocess file name doesn't use specific extension)
+  /* Check we don't overwrite source file (as preprocess file name doesn't use specific extension) */
   IF ((ipInDir + '/':U + ipInFile) = preprocessFile) THEN DO:
     MESSAGE SUBSTITUTE("Preprocessor disabled for &1 as it would overwrite source file", preprocessFile).
     preprocessFile = ?.

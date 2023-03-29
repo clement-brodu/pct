@@ -54,12 +54,24 @@ public class PCTDynamicRun extends PCTRun {
 
     @Override
     public void setParameter(String param) {
-        throw new UnsupportedOperationException("No -param attribute in this mode");
+        if (getDLCMajorVersion() < 11) {
+            // Compatibility V10
+            super.setParameter(param);
+        }
+        else {
+            throw new UnsupportedOperationException("No -param attribute in this mode");
+        }
     }
 
     @Override
     public void setIniFile(File iniFile) {
-        throw new UnsupportedOperationException("No -ininame attribute in this mode");
+        if (getDLCMajorVersion() < 11) {
+            // Compatibility V10
+            super.setIniFile(iniFile);
+        }
+        else {
+            throw new UnsupportedOperationException("No -ininame attribute in this mode");
+        }
     }
 
     private void writeJsonConfigFile() throws IOException {
@@ -162,6 +174,12 @@ public class PCTDynamicRun extends PCTRun {
 
     @Override
     public void execute() {
+        if (getDLCMajorVersion() < 11 && (this instanceof PCTDumpIncremental || this instanceof PCTLoadSchema )) {
+            // Compatibility V10, only for PCTDumpIncremental and PCTLoadSchema
+            super.execute();
+            return;
+        }
+
         checkDlcHome();
         runAttributes.checkConfig();
         if ((runAttributes.getOutputParameters() != null)
@@ -250,6 +268,9 @@ public class PCTDynamicRun extends PCTRun {
     @Override
     protected void cleanup() {
         super.cleanup();
+
+        // Compatibility V10
+        if (getDLCMajorVersion() < 11) return;
 
         if (getDebugPCT())
             return;

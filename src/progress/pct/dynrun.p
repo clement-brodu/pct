@@ -40,13 +40,13 @@ ASSIGN configJson = CAST(jsonParser:ParseFile(SESSION:PARAMETER), JsonObject).
 
 ASSIGN pctVerbose = configJson:getLogical("verbose").
 
-// DB connections + aliases
+/* DB connections + aliases */
 ASSIGN dbEntries = configJson:GetJsonArray("databases").
 DO zz = 1 TO dbEntries:Length ON ERROR UNDO, THROW:
   ASSIGN dbEntry = dbEntries:GetJsonObject(zz).
   RUN dbConnect (dbEntry).
   CATCH pErr AS Progress.Lang.Error:
-    // TODO Some messages are just warnings. Example: 512 is for no-integrity mode
+    /* TODO Some messages are just warnings. Example: 512 is for no-integrity mode */
     DO zz2 = 1 TO pErr:NumMessages:
       MESSAGE pErr:GetMessage(zz2).
     END.
@@ -55,7 +55,7 @@ DO zz = 1 TO dbEntries:Length ON ERROR UNDO, THROW:
   END.
 END.
 
-// PROPATH entries
+/* PROPATH entries */
 ASSIGN ppEntries = configJson:GetJsonArray("propath").
 DO zz = 1 TO ppEntries:Length:
     ASSIGN PROPATH = ppEntries:getCharacter(zz) + "," + PROPATH.
@@ -63,7 +63,7 @@ END.
 IF pctVerbose THEN
   MESSAGE "PROPATH : " + PROPATH.
 
-// Input parameters
+/* Input parameters */
 ASSIGN prmEntries = configJson:GetJsonArray("parameters").
 DO zz = 1 TO prmEntries:Length:
   ASSIGN prmEntry = prmEntries:GetJsonObject(zz).
@@ -79,7 +79,7 @@ if (configJson:getCharacter("callback") GT "":U) THEN DO:
   mainCallback:initialize().
 END.
 
-// Output parameters
+/* Output parameters */
 ASSIGN outprmEntries = configJson:GetJsonArray("output").
 
 IF configJson:getLogical("super") THEN DO:
@@ -88,7 +88,7 @@ END.
 
 ASSIGN procOrClass = configJson:has("procedure").
 
-// Execute procedure
+/* Execute procedure */
 IF pctVerbose THEN DO:
   IF procOrClass THEN
     MESSAGE SUBSTITUTE("RUN &1", configJson:getCharacter("procedure")).
