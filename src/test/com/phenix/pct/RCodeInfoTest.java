@@ -41,7 +41,7 @@ public class RCodeInfoTest extends BuildFileTestNg {
     /**
      * Compares CRC and MD5 using RCodeInfo and RCODE-INFO:CRC-VALUE
      */
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test1() throws IOException, InvalidRCodeException {
         String digest1;
         String digest2;
