@@ -138,8 +138,7 @@ public class PCTBgCompileClass extends PCTBgCompile {
 
             for (Iterator<CompilationUnit> iter = myUnits.iterator(); iter.hasNext();) {
                 CompilationUnit cu = iter.next();
-                if (!cu.isClass()) continue;
-                
+
                 objName = cu.getRcodeFile();
                 java.nio.file.Path vSourceFile = Paths.get(vSrcDir, objName );
                 java.nio.file.Path vDestFile = Paths.get(vDestDir, objName);

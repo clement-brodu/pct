@@ -382,11 +382,11 @@ PROCEDURE compileXref:
   RUN adecomm/_osfext.p(INPUT cFile, OUTPUT cFileExt).
 
   /* Compile class in temp OutputDir if defined */
-  vOutputTempDir = IF cTempOutput > "" AND LC(cFileExt) = ".cls" THEN cTempOutput ELSE OutputDir. 
+  vOutputTempDir = IF cTempOutput > "" THEN cTempOutput ELSE OutputDir. 
   ASSIGN opError = NOT createDir(vOutputTempDir, cBase).
   IF (opError) THEN RETURN.
   /* use a retry directory if compile in .pctcomp */
-  IF ipInFile MATCHES "*~~.cls":U AND REPLACE(vOutputTempDir, CHR(92), '/':U) MATCHES "*/~~.pctcomp/*" THEN
+  IF REPLACE(vOutputTempDir, CHR(92), '/':U) MATCHES "*/~~.pctcomp/*" THEN
   DO:
     ASSIGN
       vOutputTempDirRetry = vOutputTempDir + "-retry"
@@ -554,6 +554,8 @@ PROCEDURE compileXref:
     /* In order to handle <mapper> element */
     IF ((cRenameFrom NE '') AND (cRenameFrom NE ipOutFile)) THEN DO:
       RUN logVerbose IN hSrcProc (SUBSTITUTE("Mapper: renaming &1/&2 to &1/&3", outputDir, cRenameFrom, ipOutFile)).
+      /* ensure dest dir exist before copy */
+      createDir(vOutputTempDir, cBase2).
       OS-COPY VALUE(vOutputTempDir + '/' + cRenameFrom) VALUE(vOutputTempDir + '/' + ipOutFile).
       OS-DELETE VALUE(vOutputTempDir + '/' + cRenameFrom).
     END.
