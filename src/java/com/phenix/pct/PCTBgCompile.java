@@ -355,6 +355,8 @@ public class PCTBgCompile extends PCTBgRun {
             sb.append(Boolean.toString(getVersion().compareTo(new DLCVersion(12, 2, "0")) >= 0
                     && compAttrs.isRequireReturnValues())).append(';');
 
+            sb.append(Boolean.toString(compAttrs.isPctRcode())).append(';');
+            
             return sb.toString();
         }
 
