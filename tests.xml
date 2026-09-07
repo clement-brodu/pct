@@ -16,13 +16,16 @@
     <not><isset property="OE_MAJOR_VERSION" /></not>
   </condition>
   <!-- Groups to be executed depending on OpenEdge major version -->
-  <condition property="GROUPS" value="v11">
+  <condition property="GROUPS" value="v10">
+    <equals arg1="${OE_MAJOR_VERSION}" arg2="10" />
+  </condition>
+  <condition property="GROUPS" value="v10,v11">
     <equals arg1="${OE_MAJOR_VERSION}" arg2="11" />
   </condition>
-  <condition property="GROUPS" value="v11,v12">
+  <condition property="GROUPS" value="v10,v11,v12">
     <equals arg1="${OE_MAJOR_VERSION}" arg2="12" />
   </condition>
-  <condition property="GROUPS" value="v11,v12,v13">
+  <condition property="GROUPS" value="v10,v11,v12,v13">
     <equals arg1="${OE_MAJOR_VERSION}" arg2="13" />
   </condition>
 
@@ -31,6 +34,9 @@
     <os family="windows" />
   </condition>
   <!-- Excluded group depending on version -->
+  <condition property="EXCLUDES-VERSION" value="nov10">
+    <equals arg1="${OE_MAJOR_VERSION}" arg2="10" />
+  </condition>
   <condition property="EXCLUDES-VERSION" value="nov11">
     <equals arg1="${OE_MAJOR_VERSION}" arg2="11" />
   </condition>

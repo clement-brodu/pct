@@ -87,7 +87,7 @@ public class PCTCompileExtTest extends PCTCompileTest {
         // No-op
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test101() {
         configureProject(getBaseDir() + "test101/build.xml");
         executeTarget("test");
@@ -98,7 +98,7 @@ public class PCTCompileExtTest extends PCTCompileTest {
         assertTrue(f2.exists());
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test102() {
         configureProject(getBaseDir() + "test102/build.xml");
         executeTarget("test");
@@ -119,7 +119,7 @@ public class PCTCompileExtTest extends PCTCompileTest {
         assertEquals(f3.lastModified(), l3);
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test103() throws IOException {
         File inputDir = new File(getBaseDir() + "test103/src");
         File subDir1 = new File(inputDir, "dir1");
@@ -140,7 +140,7 @@ public class PCTCompileExtTest extends PCTCompileTest {
         assertTrue(f.exists());
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test104() {
         configureProject(getBaseDir() + "test104/build.xml");
         executeTarget("base");
@@ -157,7 +157,7 @@ public class PCTCompileExtTest extends PCTCompileTest {
         assertTrue(f3.exists());
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test105() {
         configureProject(getBaseDir() + "test105/build.xml");
         executeTarget("base");
@@ -170,7 +170,7 @@ public class PCTCompileExtTest extends PCTCompileTest {
         assertFalse(f2.exists());
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test106() {
         configureProject(getBaseDir() + "test106/build.xml");
         executeTarget("test");
@@ -180,7 +180,7 @@ public class PCTCompileExtTest extends PCTCompileTest {
         assertEquals(f1.list().length, 2);
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test107() {
         configureProject(getBaseDir() + "test107/build.xml");
         executeTarget("test");

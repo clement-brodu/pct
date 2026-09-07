@@ -26,7 +26,7 @@ import com.phenix.pct.DlcHome;
 
 public class DlcHomeTest extends BuildFileTestNg {
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test0() {
         DlcHome dlcHome = new DlcHome();
         try {
@@ -37,7 +37,7 @@ public class DlcHomeTest extends BuildFileTestNg {
         }
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test1() {
         configureProject("DlcHome/test1/build.xml");
         executeTarget("test");
@@ -45,7 +45,7 @@ public class DlcHomeTest extends BuildFileTestNg {
         executeTarget("test2");
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test2() {
         configureProject("DlcHome/test2/build.xml");
         executeTarget("test");

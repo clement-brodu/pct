@@ -27,7 +27,7 @@ import org.testng.annotations.Test;
 public class PCTVersionTest extends BuildFileTestNg {
     private static final String PCT_REGEXP = "pct-\\d\\d\\d-.*-.*";
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test1() {
         configureProject("PCTVersion/test1/build.xml");
 
@@ -36,7 +36,7 @@ public class PCTVersionTest extends BuildFileTestNg {
         expectLogRegexp("test", rexp, true);
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void test2() {
         configureProject("PCTVersion/test2/build.xml");
         List<String> rexp = new ArrayList<>();

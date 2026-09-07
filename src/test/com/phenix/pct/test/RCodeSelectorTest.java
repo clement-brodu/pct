@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class RCodeSelectorTest extends BuildFileTestNg {
 
-    @Test(groups = { "v11" })
+    @Test(groups = { "v10" })
     public void test1() {
         configureProject("RCodeSelector/test1/build.xml");
         executeTarget("prepare");

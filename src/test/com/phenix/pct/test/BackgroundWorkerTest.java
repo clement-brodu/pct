@@ -69,8 +69,8 @@ public class BackgroundWorkerTest {
         }
 
     }
-
-    @BeforeTest(groups = {"v11"})
+    
+    @BeforeTest(groups = {"v10"})
     public void setUp() {
         PCTBgRun parent = mock(PCTBgRun.class);
         backgroundWorker = new SimpleBackgroundWorker(parent);
@@ -90,7 +90,7 @@ public class BackgroundWorkerTest {
         return socket;
     }
 
-    @Test(groups = {"v11"})
+    @Test(groups = {"v10"})
     public void readMSGFromResponsePacket() throws IOException {
         Socket socket = setUpSocket("\n" + "MSG:0:Message here\n" + "END");
 
@@ -103,16 +103,16 @@ public class BackgroundWorkerTest {
         assertEquals("Message here", m.getMsg());
         assertEquals(0, m.getLevel());
     }
-
-    @Test(groups = {"v11"})
+    
+    @Test(groups = {"v10"})
     public void readOKFromResponsePacket() throws IOException {
         Socket socket = setUpSocket("\n" + "OK\n" + "END");
 
         backgroundWorker.initialize(socket);
         backgroundWorker.listen();
     }
-
-    @Test(groups = {"v11"})
+    
+    @Test(groups = {"v10"})
     public void readERRFromResponsePacket() throws IOException {
         Socket socket = setUpSocket("\n" + "ERR:Error message\n" + "END");
 
@@ -121,8 +121,8 @@ public class BackgroundWorkerTest {
 
         assertEquals("Error message", backgroundWorker.getCustomResponse());
     }
-
-    @Test(groups = {"v11"})
+    
+    @Test(groups = {"v10"})
     public void testEmptyResponsePacketDoesNotThrowNPE() throws IOException {
         Socket socket = setUpSocket("\n");
 
