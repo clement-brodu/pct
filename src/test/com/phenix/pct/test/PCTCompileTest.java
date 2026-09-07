@@ -328,6 +328,10 @@ public class PCTCompileTest extends BuildFileTestNg {
 
     @Test(groups = {"v11"})
     public void test22() {
+        test22_internal(true);
+    }
+
+    protected void test22_internal(boolean XdotRexist){
         configureProject(getBaseDir() + "test22/build.xml");
         executeTarget("test");
 
@@ -344,7 +348,7 @@ public class PCTCompileTest extends BuildFileTestNg {
         File f5 = new File(getBaseDir() + "test22/build2/Y.r");
         assertTrue(f5.exists());
         File f6 = new File(getBaseDir() + "test22/build2/X.r");
-        assertTrue(f6.exists());
+        assertTrue(f6.exists() == XdotRexist); // X.r doesn't exist id PCTCompileExt is used
     }
 
     @Test(groups = {"v11", "win"})
@@ -1777,7 +1781,8 @@ public class PCTCompileTest extends BuildFileTestNg {
         assertTrue(new File(getBaseDir(), "test93/build2/test.r").exists());
     }
 
-    @Test(groups = {"v11"})
+    // Ignored, in the fork we use temp-directory
+    //@Test(groups = {"v11"})
     public void test94() {
         configureProject(getBaseDir() + "test94/build.xml");
         File f1 = new File(getBaseDir(), "test94/src1/rssw/MyClass.r");
