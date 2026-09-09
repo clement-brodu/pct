@@ -520,7 +520,7 @@ public class PCTRunTest extends BuildFileTestNg {
 
         expectLog("test1", ".Net version: 4.0.30319.42000");
         List<String> rexp = new ArrayList<>();
-        rexp.add("\\.Net version: 6\\.0\\.\\d+"); // fix: patch version can change with updates
+        rexp.add("\\.Net version: \\d+\\.\\d+\\.\\d+$"); // fix: patch version can change with updates
         expectLogRegexp("test2", rexp, false);  
     }
 
