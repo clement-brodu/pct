@@ -4,6 +4,12 @@ This project was born due to the lack of automated OpenEdge build environment. P
 
 PCT has been designed and written by Gilles QUERRET ([Riverside Software](http://riverside-software.fr)).
 
+## FORK
+
+This fork support OE10 to OE13 for PCTCompile and PCTCreateDatabase.
+
+There are also some customizations (see [WIKI](https://github.com/clement-brodu/pct/wiki) and Releases descriptions).
+
 ## Documentation
 
 Documentation is available [in the Wiki pages](https://wiki.rssw.eu/pct/)
