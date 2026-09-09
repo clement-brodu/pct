@@ -27,7 +27,8 @@ public class PCTDependenciesTest extends BuildFileTestNg {
         return "Dependencies/";
     }
 
-    @Test(groups= {"v12"})
+    // Ignored in fork because it need deps in a maven repo
+    //@Test(groups= {"v12"})
     public void test01() {
         configureProject(getBaseDir() + "test01/build.xml");
         executeTarget("test");
